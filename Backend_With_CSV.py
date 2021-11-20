@@ -1,10 +1,10 @@
 import csv
-def create_account():
+def create_account() -> tuple:
     uid = input("Enter Unique ID: ")
     if len(uid) != 16:
         print("Invalid Unique ID")
         return 0
-def login():
+def login() -> tuple:
     uid = input("Enter Unique ID: ")
     password = input("Enter Password: ")
 if __name__ == '__main__':
@@ -21,6 +21,8 @@ if __name__ == '__main__':
         choice = int(input("Enter Choice:"))
         if choice == 1:
             token = login()
+        elif choice == 2:
+            token = create_account()
     elif choice == 2:
         #Admin Panel
         print("Login: 1\n")
