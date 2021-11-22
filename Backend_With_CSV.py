@@ -1,8 +1,11 @@
 import csv
 import hashlib
 from os import times
+import os
 import time
 from datetime import datetime, date
+from cryptography import fernet
+from cryptography.fernet import Fernet
 
 
 def create_account() -> tuple:
@@ -64,7 +67,7 @@ def create_account() -> tuple:
         hash_text = account_number.join(str(timestamp))
         result = hashlib.sha256(hash_text.encode()).hexdigest()
         passbook_name = result+".csv"
-        with open(r""+passbook_name,"w",newline="\n") as passbook:
+        with open(r"./Passbooks/"+passbook_name,"w",newline="\n") as passbook:
             now = datetime.now()
             current_date = date.today().strftime("%d/%m/%Y")
             current_time = now.strftime("%H:%M:%S")
@@ -73,6 +76,21 @@ def create_account() -> tuple:
             csv.writer(passbook).writerow(fields)
             csv.writer(passbook).writerow(details)
             print("Passbook created successfully")
+        password = input("Enter a atleast 8 characters password: ") # Check regex pattern later on.
+        password = hashlib.sha256(password.encode()).hexdigest()
+        key = Fernet.generate_key()
+        with open(r"./Passbooks/"+passbook_name, 'rb') as unencrypted:
+            _file = unencrypted.read()
+            encrypted = Fernet(key).encrypt(_file)
+        with open(r"./Passbooks/"+passbook_name, 'wb') as encrypted_file:
+            encrypted_file.write(encrypted)
+            print("Your key to access your account passbook is\n:",key)
+            if input("Do you want to save this key? Enter y for yes:") == 'y':
+                directory = os.path.join(account_number+"_key.key")
+                open(directory, 'wb').write(key)
+                print("Your key is saved at",directory)
+
+                
 def login() -> tuple:
     uid = input("Enter Unique ID: ")
     password = input("Enter Password: ")
