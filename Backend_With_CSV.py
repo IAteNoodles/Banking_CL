@@ -1,5 +1,8 @@
 import csv
-
+import hashlib
+from os import times
+import time
+from datetime import datetime, date
 
 
 def create_account() -> tuple:
@@ -25,7 +28,8 @@ def create_account() -> tuple:
         data.append(input("Email Address:"))
         csv.writer(open(r"./user.csv", "a")).writerows([data])
     print("Your record already exists in the database")
-    print("Unique ID:%s, Name:%s, Address:%s, Date of Birth:%s, Phone Number:%s, Email Address:%s" % (data[0],
+    print("----------------------------------------------------------------")
+    print("Unique ID: %s\nName: %s\nAddress: %s\nDate of Birth: %s\nPhone Number: %s\nEmail Address: %s\n" % (data[0],
                                                                                                       data[1],
                                                                                                       data[2],
                                                                                                       data[3],
@@ -36,15 +40,43 @@ def create_account() -> tuple:
                      2: "Current Account",
                      3: "Corporate Account"}
     print(account_types)
-    account_type = int(input("Account Type: "))
-    if account_type not in account_types.keys():
+    account_type = account_types[int(input("Account Type: "))]
+    print(account_type)
+    print(account_types.items())
+    if account_type not in account_types.values():
         print("Invalid Account Type")
-
-
+        return
+    else:
+        print("Enter Amount for Account Initialization. (Minimum first time deposit required is Rs.1000")
+        first_amount = int(input("Amount for Account Initialization: "))
+        if first_amount < 1000:
+            print("Minimum first time deposit required is Rs.1000")
+            return
+        user_count = open(r"./count.txt").read()
+        open(r"./count.txt","w").write(str(int(user_count)+1))
+        account_number = account_type.split()[0][0] + account_type.split()[1][0]
+        account_number = account_number+(user_count)
+        timestamp = time.time()
+        with open(r"./account_details.csv","a",encoding="utf-8",newline="\n") as account_database:
+            details = [account_number,uid, first_amount]
+            csv.writer(account_database).writerow(details)
+        print("Account created successfully")
+        hash_text = account_number.join(str(timestamp))
+        result = hashlib.sha256(hash_text.encode()).hexdigest()
+        passbook_name = result+".csv"
+        with open(r""+passbook_name,"w",newline="\n") as passbook:
+            now = datetime.now()
+            current_date = date.today().strftime("%d/%m/%Y")
+            current_time = now.strftime("%H:%M:%S")
+            fields = ["Credit","Deposit","Date","Time","Via"]
+            details = ["",first_amount,current_date,current_time,"Initial Deposit"]
+            csv.writer(passbook).writerow(fields)
+            csv.writer(passbook).writerow(details)
+            print("Passbook created successfully")
 def login() -> tuple:
     uid = input("Enter Unique ID: ")
     password = input("Enter Password: ")
-
+    
 
 if __name__ == '__main__':
     print("User: 1\n"
