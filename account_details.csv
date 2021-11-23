@@ -1,2 +1,4 @@
-account id, user unique id, timestamp, current balance
-SA0,8c1svz9kfwo4g93f,1637604523.265735
+account number,user unique id,timestamp,current balance
+SA1,6XYctEhJUP6UGzoH,1637669940.2481165,21000
+BA2,6XYctEhJUP6UGzo7,1637669959.62024,9555
+CA3,6XYctEhJUP6UGzo7,1637669993.6221824,2222222

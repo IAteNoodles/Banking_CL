@@ -1,4 +1,5 @@
 import csv
+import pandas as pd
 import hashlib
 from os import times
 import time
@@ -16,7 +17,6 @@ def create_account() -> tuple:
     user_data = csv.reader(open(r"./user.csv"))
     for row in user_data:
         for details in row:
-            print(details)
             if row[0] == uid:
                 for detail in row:
                     data.append(detail)
@@ -61,7 +61,7 @@ def create_account() -> tuple:
         account_number = account_number+(user_count)
         timestamp = time.time()
         with open(r"./account_details.csv","a",encoding="utf-8",newline="\n") as account_database:
-            details = [account_number,uid,timestamp]
+            details = [account_number,uid,timestamp,first_amount]
             csv.writer(account_database).writerow(details)
         print("Account created successfully")
         # Salts the account number with the timestamp.
@@ -125,17 +125,35 @@ def login() -> tuple:
                         passbook_name = result+".csv"
                         passbook_location = r"./Passbooks/"+passbook_name
                         key = Fernet(input("Enter the account key:"))
-                        with open(passbook_location,"rb") as account:
-                            print(account.read())
                         with open(passbook_location,'rb') as file:
                             encrypted = file.read()
                         decrypted = key.decrypt(encrypted)
                         with open(passbook_location,"wb") as file:
                             file.write(decrypted)
-                        with open(passbook_location) as account:
-                            reader = csv.reader(account)
-                            for row in reader:
-                                print(row)
+                        def account_actions():
+                            print("Welcome")
+                            print("Enter 1 to deposit to your account.")
+                            def deposit():
+                                amount = int(input("Enter amount to be deposit to your account"))
+                                via = int(input("Select Payment method.\n1-Cash\n2Cheque\nEnter your method: "))
+                                with open(passbook_location,"a",newline="\n") as account:
+                                    now = datetime.now()
+                                    current_date = date.today().strftime("%d/%m/%Y")
+                                    current_time = now.strftime("%H:%M:%S")
+                                    csv.writer(account).writerow(["",amount,current_date,current_time,via])
+                                    dataframe = pd.read_csv(r"./account_details.csv")
+                                    dataframe.loc[0,"current balance"] = dataframe.loc[0,"current balance"]+amount
+                                    dataframe.to_csv(r"./account_details.csv",index=False)
+                                print("Successful")
+                            print("Enter 2 to withdraw from your account.")
+                            choice = int(input("Enter Choice: "))
+                            if choice == 1:
+                                deposit()
+                        account_actions()
+                        with open(passbook_location,"wb") as file:
+                            file.write(encrypted)
+                            
+                        
         if len(user_accounts) == 0:
             print("No account linked to your unique ID found.")
             if input("Do you want to create an account?\nEnter y for yes:") == 'y':
