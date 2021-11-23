@@ -1,17 +1,2 @@
 account id, user unique id, timestamp, current balance
-SA0,ceyi7qvtffdrvt00,5000
-CA1,ceyi7qvtffdrvt00,2000
-CA2,ceyi7qvtffdrvt00,2000
-CA3,ceyi7qvtffdrvt00,2000
-CA4,ceyi7qvtffdrvt00,3333
-CA5,ceyi7qvtffdrvt00,2222
-CA6,ceyi7qvtffdrvt00,2000
-CA7,8c1svz9kfwo4g93f,2000
-CA8,8c1svz9kfwo4g93f,10000
-CA9,8c1svz9kfwo4g93f,2000
-SA10,8c1svz9kfwo4g93f,10000
-SA11,8c1svz9kfwo4g93f,20000
-CA12,8c1svz9kfwo4g93f,2000
-CA13,8c1svz9kfwo4g93f,10000
-SA14,8c1svz9kfwo4g93f,1000000
-CA15,8c1svz9kfwo4g93f,2000
+SA0,8c1svz9kfwo4g93f,1637604523.265735
