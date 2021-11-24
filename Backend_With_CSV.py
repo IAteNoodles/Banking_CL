@@ -1,27 +1,30 @@
 import csv
-import pandas as pd
 import hashlib
-from os import times
+import json
+import re
 import time
-from datetime import datetime, date
+from datetime import date, datetime
+from os import times
+
+import pandas as pd
 from cryptography.fernet import Fernet
 
 
-def create_account() -> tuple:
+def create_account() -> None:
     uid = input("Enter Unique ID: ")
     if len(uid) != 16:
         print("Invalid Unique ID")
-        return 0
+        create_account()
     data = list()
     # Checking if there already is a record with the unique ID in the database (CSV file)
     user_data = csv.reader(open(r"./user.csv"))
     for row in user_data:
-        for details in row:
-            if row[0] == uid:
-                for detail in row:
-                    data.append(detail)
-                break
-    # If no record with the unique ID in the database exists, asks for the data and adds it to the database.
+        if row[0] == uid:
+            for detail in row:
+                data.append(detail)
+            # Exists the loop once data is retrieved.
+            break
+    # Check:    If no record with the unique ID in the database exists, asks for the data and adds it to the database.
     if len(data) == 0:
         data.append(uid)
         data.append(input("Name: "))
@@ -41,21 +44,23 @@ def create_account() -> tuple:
     # Account Signing Form
     account_types = {1: "Savings Account",
                      2: "Current Account",
-                     3: "Bussiness Account"}
-    print(account_types)
-    account_type = account_types[int(input("Account Type: "))]
-    print(account_type)
-    print(account_types.items())
-    if account_type not in account_types.values():
-        print("Invalid Account Type")
-        return
-    else:
-        print("Enter Amount for Account Initialization. (Minimum first time deposit required is Rs.1000")
-        first_amount = int(input("Amount for Account Initialization: "))
-        if first_amount < 1000:
+                     3: "Business Account"}
+    print("Choose Account Type:")
+    formated_account_types = json.dumps(account_types, indent=2).strip("{}")
+    for types in formated_account_types.split(","):
+        print(types.replace("\"",""))
+    try:
+        account_type = account_types[int(input("Account Type: "))]
+        while(True):
+            print("Enter Amount for Account Initialization.")
             print("Minimum first time deposit required is Rs.1000")
-            return
-        user_count = open(r"./count.txt").read()
+            first_amount = int(input("Amount for Account Initialization: "))
+            if first_amount >= 1000:
+                break
+        account_counters = list(csv.DictReader(open(r"./count.csv")))
+        user_count = account_counters[0][account_type]
+        account_counters[account_type]+=1
+        csv.DictWriter(open(r"./account_details.csv")).writerow(account_counters)
         open(r"./count.txt","w").write(str(int(user_count)+1))
         account_number = account_type.split()[0][0] + account_type.split()[1][0]
         account_number = account_number+(user_count)
@@ -90,7 +95,8 @@ def create_account() -> tuple:
                 directory = "./Keys/"+account_number+"_key.key"
                 open(directory, 'wb').write(key)
                 print("Your key is saved at",directory)
-
+    except KeyError:
+        print("Wrong Account Type")
                 
 def login() -> tuple:
     uid = input("Enter Unique ID: ")
