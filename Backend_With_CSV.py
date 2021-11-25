@@ -1,14 +1,14 @@
 import csv
 import hashlib
+import io
 import json
 import re
 import time
 from datetime import date, datetime
 from os import times
-
 import pandas as pd
 from cryptography.fernet import Fernet
-
+import pickle
 
 def create_account() -> None:
     uid = input("Enter Unique ID: ")
@@ -57,13 +57,14 @@ def create_account() -> None:
             first_amount = int(input("Amount for Account Initialization: "))
             if first_amount >= 1000:
                 break
-        account_counters = list(csv.DictReader(open(r"./count.csv")))
-        user_count = account_counters[0][account_type]
-        account_counters[account_type]+=1
-        csv.DictWriter(open(r"./account_details.csv")).writerow(account_counters)
-        open(r"./count.txt","w").write(str(int(user_count)+1))
+        # Opens up the count.dat file which contains the various counters.
+        with open(r"./count.dat","rb+") as count_file:
+            counter = pickle.load(count_file)
+            user_count = counter[account_type]
+            counter[account_type] = user_count+1
+            pickle.dump(counter, open("./count.dat","wb"))
         account_number = account_type.split()[0][0] + account_type.split()[1][0]
-        account_number = account_number+(user_count)
+        account_number = account_number+str(user_count)
         timestamp = time.time()
         with open(r"./account_details.csv","a",encoding="utf-8",newline="\n") as account_database:
             details = [account_number,uid,timestamp,first_amount]
